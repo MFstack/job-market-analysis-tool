@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data files (large datasets)
+data/raw/*.csv
+data/raw/*.xlsx
+data/raw/*.json
+data/raw/*.zip
+
+# Keep processed data but ignore large files
+data/processed/*.csv
+!data/processed/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# PyCharm
+.idea/
+
+# Model checkpoints
+*.pkl
+*.h5
+*.model
+
+# Logs
+*.log
+

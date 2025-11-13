@@ -13,17 +13,30 @@ This project analyzes job market data to extract actionable insights about:
 
 ## 📊 Dataset
 
-This project uses the **LinkedIn Job Postings Dataset** from Kaggle:
-- [LinkedIn Job Postings - 2023 Dataset](https://www.kaggle.com/datasets/arshkon/linkedin-job-postings)
+This project supports **three methods** to get data:
 
-**Alternative datasets:**
+### Method 1: Use Existing Datasets (Recommended for learning)
+- [LinkedIn Job Postings - 2023 Dataset](https://www.kaggle.com/datasets/arshkon/linkedin-job-postings)
 - [Data Science Job Postings](https://www.kaggle.com/datasets/rashikrahmanpritom/data-science-job-posting-on-glassdoor)
 - [Job Posts Data](https://www.kaggle.com/datasets/madhab/jobposts)
+
+### Method 2: Web Scraping (Collect Your Own Data!) 🕷️
+- Scrape Indeed.com for global job data
+- Scrape Bayt.com for Middle East/Saudi job market
+- Store data in CSV, JSON, or SQLite database
+- See [WEB_SCRAPING_GUIDE.md](WEB_SCRAPING_GUIDE.md) for details
+
+### Method 3: Generate Sample Data (Fastest for testing)
+- Auto-generate 500+ sample job postings
+- Perfect for testing and demonstrations
+- Run: `python run_scraper.py`
 
 ## 🛠️ Tech Stack
 
 - **Language:** Python 3.8+
 - **Data Processing:** pandas, NumPy
+- **Web Scraping:** BeautifulSoup, Requests, Selenium, Scrapy
+- **Database:** SQLite3
 - **Visualization:** Matplotlib, Seaborn, Plotly, WordCloud
 - **NLP:** NLTK, spaCy
 - **ML:** scikit-learn
@@ -41,15 +54,20 @@ Job Market Analysis Tool/
 ├── notebooks/                     # Jupyter notebooks
 │   └── job_market_analysis.ipynb  # Main analysis notebook
 │
-├── src/                           # Source code (optional)
-│   ├── data_collection.py
-│   ├── data_cleaning.py
-│   └── visualization.py
+├── src/                           # Source code
+│   ├── job_scraper.py             # Web scraping tools
+│   ├── database_manager.py        # SQLite database management
+│   └── __init__.py
 │
 ├── visualizations/                # Saved plots and charts
 │
+├── run_scraper.py                 # Easy-to-use scraper interface
+├── streamlit_app.py               # Interactive dashboard
 ├── requirements.txt               # Python dependencies
-└── README.md                      # Project documentation
+├── README.md                      # Project documentation
+├── QUICKSTART.md                  # Setup guide
+├── WEB_SCRAPING_GUIDE.md         # Scraping documentation
+└── PROJECT_HIGHLIGHTS.md          # Portfolio tips
 ```
 
 ## 🚀 Getting Started
@@ -79,7 +97,26 @@ python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
 2. Download the dataset
 3. Extract to `data/raw/` folder
 
-### 3. Run Analysis
+### 3. Collect Data (Choose One Method)
+
+#### Option A: Use Kaggle Dataset
+```bash
+# Download from Kaggle and place in data/raw/
+```
+
+#### Option B: Web Scraping (Collect Your Own!)
+```bash
+# Interactive scraper interface
+python run_scraper.py
+
+# Or use directly in Python:
+from src.job_scraper import create_sample_scraped_data
+create_sample_scraped_data('data/raw/jobs.csv')
+```
+
+See [WEB_SCRAPING_GUIDE.md](WEB_SCRAPING_GUIDE.md) for complete documentation.
+
+### 4. Run Analysis
 
 ```bash
 # Start Jupyter Notebook

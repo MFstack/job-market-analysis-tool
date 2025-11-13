@@ -121,10 +121,9 @@ jupyter notebook
 
 ## 👤 Author
 
-Computer Science Graduate
+MFstack
 Portfolio Project - 2025
 
-## 📄 License
 
 This project is for educational and portfolio purposes.
 

@@ -115,34 +115,49 @@ if df is not None:
     with col_left:
         # Top Job Titles
         st.subheader("💼 Top 10 Job Titles")
-        if 'job_title_clean' in df.columns:
-            top_jobs = df['job_title_clean'].value_counts().head(10)
-            fig = px.bar(
-                x=top_jobs.values,
-                y=top_jobs.index,
-                orientation='h',
-                labels={'x': 'Number of Jobs', 'y': 'Job Title'},
-                color=top_jobs.values,
-                color_continuous_scale='Blues'
-            )
-            fig.update_layout(showlegend=False, height=400)
-            st.plotly_chart(fig, use_container_width=True)
+        # Use job_title_clean if available, otherwise use job_title
+        title_col = 'job_title_clean' if 'job_title_clean' in df.columns else 'job_title'
+        
+        if title_col in df.columns:
+            top_jobs = df[title_col].value_counts().head(10)
+            
+            if len(top_jobs) > 0:
+                fig = px.bar(
+                    x=top_jobs.values,
+                    y=top_jobs.index,
+                    orientation='h',
+                    labels={'x': 'Number of Jobs', 'y': 'Job Title'},
+                    color=top_jobs.values,
+                    color_continuous_scale='Blues'
+                )
+                fig.update_layout(showlegend=False, height=400)
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No job title data available")
+        else:
+            st.warning("Job title column not found in data")
     
     with col_right:
         # Top Locations
         st.subheader("🌍 Top 10 Locations")
         if 'location' in df.columns:
             top_locations = df['location'].value_counts().head(10)
-            fig = px.bar(
-                x=top_locations.values,
-                y=top_locations.index,
-                orientation='h',
-                labels={'x': 'Number of Jobs', 'y': 'Location'},
-                color=top_locations.values,
-                color_continuous_scale='Greens'
-            )
-            fig.update_layout(showlegend=False, height=400)
-            st.plotly_chart(fig, use_container_width=True)
+            
+            if len(top_locations) > 0:
+                fig = px.bar(
+                    x=top_locations.values,
+                    y=top_locations.index,
+                    orientation='h',
+                    labels={'x': 'Number of Jobs', 'y': 'Location'},
+                    color=top_locations.values,
+                    color_continuous_scale='Greens'
+                )
+                fig.update_layout(showlegend=False, height=400)
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No location data available")
+        else:
+            st.warning("Location column not found in data")
     
     st.markdown("---")
     
@@ -151,27 +166,69 @@ if df is not None:
     if 'experience_level' in df.columns:
         exp_dist = df['experience_level'].value_counts()
         
-        col1, col2 = st.columns([1, 2])
+        if len(exp_dist) > 0:
+            col1, col2 = st.columns([1, 2])
+            
+            with col1:
+                st.dataframe(
+                    pd.DataFrame({
+                        'Experience Level': exp_dist.index,
+                        'Count': exp_dist.values,
+                        'Percentage': [f"{(v/len(df)*100):.1f}%" for v in exp_dist.values]
+                    }),
+                    hide_index=True
+                )
+            
+            with col2:
+                fig = px.pie(
+                    values=exp_dist.values,
+                    names=exp_dist.index,
+                    title="",
+                    color_discrete_sequence=px.colors.qualitative.Set3
+                )
+                fig.update_traces(textposition='inside', textinfo='percent+label')
+                st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No experience level data available")
+    else:
+        st.warning("Experience level column not found in data")
+    
+    st.markdown("---")
+    
+    # Top Companies
+    st.subheader("🏢 Top Hiring Companies")
+    if 'company' in df.columns:
+        top_companies = df['company'].value_counts().head(10)
         
-        with col1:
-            st.dataframe(
-                pd.DataFrame({
-                    'Experience Level': exp_dist.index,
-                    'Count': exp_dist.values,
-                    'Percentage': [f"{(v/len(df)*100):.1f}%" for v in exp_dist.values]
-                }),
-                hide_index=True
-            )
-        
-        with col2:
-            fig = px.pie(
-                values=exp_dist.values,
-                names=exp_dist.index,
-                title="",
-                color_discrete_sequence=px.colors.qualitative.Set3
-            )
-            fig.update_traces(textposition='inside', textinfo='percent+label')
-            st.plotly_chart(fig, use_container_width=True)
+        if len(top_companies) > 0:
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                fig = px.bar(
+                    x=top_companies.values,
+                    y=top_companies.index,
+                    orientation='h',
+                    labels={'x': 'Number of Job Postings', 'y': 'Company'},
+                    color=top_companies.values,
+                    color_continuous_scale='Purples'
+                )
+                fig.update_layout(showlegend=False, height=400)
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                st.dataframe(
+                    pd.DataFrame({
+                        'Company': top_companies.index,
+                        'Jobs': top_companies.values,
+                        'Share': [f"{(v/len(df)*100):.1f}%" for v in top_companies.values]
+                    }),
+                    hide_index=True,
+                    height=400
+                )
+        else:
+            st.info("No company data available")
+    else:
+        st.warning("Company column not found in data")
     
     st.markdown("---")
     
@@ -245,8 +302,65 @@ if df is not None:
     
     st.markdown("---")
     
+    # Job Listings Section
+    st.subheader("📄 Job Postings")
+    
+    # Display mode selector
+    view_mode = st.radio("View Mode:", ["Cards", "Table"], horizontal=True)
+    
+    # Number of jobs to display
+    num_jobs = st.slider("Number of jobs to display:", 5, 50, 10)
+    
+    if view_mode == "Cards":
+        # Card view - more visual
+        for idx, row in df.head(num_jobs).iterrows():
+            with st.container():
+                col1, col2 = st.columns([3, 1])
+                
+                with col1:
+                    st.markdown(f"### {row.get('job_title', 'N/A')}")
+                    st.markdown(f"**Company:** {row.get('company', 'N/A')}")
+                    st.markdown(f"**Location:** {row.get('location', 'N/A')}")
+                    
+                with col2:
+                    if 'experience_level' in row and pd.notna(row['experience_level']):
+                        st.metric("Experience", row['experience_level'])
+                    if 'salary' in row and pd.notna(row['salary']) and row['salary'] != '':
+                        st.metric("Salary", row['salary'])
+                
+                # Description
+                if 'description' in row and pd.notna(row['description']):
+                    with st.expander("📝 Job Description"):
+                        st.write(row['description'])
+                
+                st.markdown("---")
+    else:
+        # Table view - more compact
+        display_cols = []
+        if 'job_title' in df.columns:
+            display_cols.append('job_title')
+        if 'company' in df.columns:
+            display_cols.append('company')
+        if 'location' in df.columns:
+            display_cols.append('location')
+        if 'experience_level' in df.columns:
+            display_cols.append('experience_level')
+        if 'salary' in df.columns:
+            display_cols.append('salary')
+        
+        if display_cols:
+            st.dataframe(
+                df[display_cols].head(num_jobs),
+                use_container_width=True,
+                hide_index=True
+            )
+        else:
+            st.warning("No display columns found")
+    
+    st.markdown("---")
+    
     # Raw Data Explorer
-    with st.expander("📋 View Raw Data"):
+    with st.expander("📋 View All Raw Data"):
         st.dataframe(df.head(100), use_container_width=True)
         st.info(f"Showing first 100 of {len(df):,} rows")
     
